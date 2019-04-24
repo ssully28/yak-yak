@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgres:///warbler'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 
@@ -318,10 +318,17 @@ def homepage():
     - logged in: 100 most recent messages of followees
     """
 
+    # Grab user ids for all that user is following:
+    target_ids = [user.id for user in g.user.following]
+
+    # Add users id to that list:
+    target_ids.append(g.user.id)
+
     if g.user:
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())
+                    .filter(Message.user_id.in_(target_ids))
                     .limit(100)
                     .all())
 
