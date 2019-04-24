@@ -31,9 +31,24 @@
                 {% endif %}
               {% endif %}
             </div>
-            <div><i class="fas fa-heart"></i></div>
+            <form action="/messages/{{ message.id }}/like" method="POST">
+                {% if message.user_id != g.user.id %}
+                    {% if g.user in message.likes %} 
+                        <button class="like-btn" type="submit"><i class="fas fa-heart"></i></button>
+                    {% else %}
+                        <button class="like-btn" type="submit"><i class="far fa-heart"></i></button> 
+                    {% endif %}
+                {% endif %}
+              </form> 
             <p class="single-message">{{ message.text }}</p>
             <span class="text-muted">{{ message.timestamp.strftime('%d %B %Y') }}</span>
+            <div>
+                {% for user in message.likes %}
+                    <a href="{{ url_for('users_show', user_id=user.id) }}">
+                        <img src="{{ user.image_url }}" alt="" class="like-icons">
+                    </a>
+                {% endfor %}
+            </div>
           </div>
         </li>
       </ul>

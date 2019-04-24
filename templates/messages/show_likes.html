@@ -55,9 +55,9 @@
             <form action="/messages/{{ msg.id }}/like" method="POST">
                 {% if msg.user_id != g.user.id %}
                     {% if g.user in msg.likes %} 
-                        <button class="like_btn" type="submit"><i class="fas fa-heart"></i></button>
+                        <button class="like-btn" type="submit"><i class="fas fa-heart"></i></button>
                     {% else %}
-                        <button class="like_btn" type="submit"><i class="far fa-heart"></i></button> 
+                        <button class="like-btn" type="submit"><i class="far fa-heart"></i></button> 
                     {% endif %}
                 {% endif %}
               </form> 
