@@ -20,6 +20,23 @@ body.error-404 {
   cursor: pointer;
 }
 
+.list-group-item form {
+    position: relative;
+}
+
+.like_btn {
+    position: absolute;
+    right: 0;
+    background:none!important;
+    color: black;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    /*border is optional*/
+    cursor: pointer;
+    z-index: 2;
+}
+
 /* ======================= Nav */
 
 .navbar {
@@ -194,6 +211,7 @@ nav + .container {
 
 .message-area {
   margin-left: 10px;
+  width: 100%;
 }
 
 #warbler-hero {

@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
-from models import db, connect_db, User, Message
+from models import db, connect_db, User, Message, Like
 
 CURR_USER_KEY = "curr_user"
 
@@ -305,6 +305,47 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+##############################################################################
+# Like Feature:
+
+@app.route('/messages/<int:message_id>/like', methods=["POST"])
+def messages_like(message_id):
+    """ 
+    Like a message 
+    Toggle liking - first check if message is
+    already liked by g.user if so delete the like
+    if not, then create the like...
+    """
+
+    is_liked = Like.query.filter_by(message_id=message_id, user_id=g.user.id).first()
+    if is_liked:
+        # Remove the like:
+        db.session.delete(is_liked)
+        db.session.commit()
+    else:
+        # Create the like:
+        like = Like(user_id=g.user.id, message_id=message_id)
+        db.session.add(like)
+        db.session.commit()
+
+    # Go back to the page that we liked/unliked the message from!
+    return redirect(request.referrer)
+    
+
+
+@app.route('/users/<int:user_id>/likes')
+def show_likes(user_id):
+    likes = Like.query.filter_by(user_id=g.user.id).all()
+    message_ids = [like.message_id for like in likes]
+    messages = Message.query.filter(Message.id.in_(message_ids)).all()
+    
+    # Basic SQL of what we're looking for here....
+    # SELECT * FROM messages 
+    # JOIN likes 
+    # ON likes.message_id = messages.id 
+    # WHERE likes.user_id = g.user.id
+
+    return render_template("/messages/show_likes.html", messages=messages)
 
 ##############################################################################
 # Homepage and error pages
@@ -318,19 +359,20 @@ def homepage():
     - logged in: 100 most recent messages of followees
     """
 
-    # Grab user ids for all that user is following:
-    target_ids = [user.id for user in g.user.following]
-
-    # Add users id to that list:
-    target_ids.append(g.user.id)
-
+    
     if g.user:
+        # Grab user ids for all that user is following:
+        target_ids = [user.id for user in g.user.following]
+
+        # Add users id to that list:
+        target_ids.append(g.user.id)
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())
                     .filter(Message.user_id.in_(target_ids))
                     .limit(100)
                     .all())
+
 
         return render_template('home.html', messages=messages)
 
