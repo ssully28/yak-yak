@@ -37,6 +37,15 @@ body.error-404 {
     z-index: 2;
 }
 
+.like-btn-msg {    
+    background:none!important;
+    color: red;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    cursor: pointer;
+    z-index: 2;
+}
 /* ======================= Nav */
 
 .navbar {
