@@ -52,7 +52,7 @@
               <p>{{ msg.text }}</p>
             </div>
             
-            <form action="/messages/{{ msg.id }}/like" method="POST">
+            <form class="like-form" action="/messages/{{ msg.id }}/like" method="POST">
                 {% if msg.user_id != g.user.id %}
                     {% if g.user in msg.likes %} 
                         <button class="like-btn" type="submit"><i class="fas fa-heart"></i></button>

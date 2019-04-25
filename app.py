@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, flash, redirect, session, g
+from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
@@ -317,21 +317,28 @@ def messages_like(message_id):
     already liked by g.user if so delete the like
     if not, then create the like...
     """
-
     is_liked = Like.query.filter_by(message_id=message_id,
                                     user_id=g.user.id).first()
+    
+    liked_status = ''
     if is_liked:
         # Remove the like:
         db.session.delete(is_liked)
         db.session.commit()
+        liked_status = 'unliked'
     else:
         # Create the like:
         like = Like(user_id=g.user.id, message_id=message_id)
         db.session.add(like)
         db.session.commit()
+        liked_status = 'liked'
+
 
     # Go back to the page that we liked/unliked the message from!
-    return redirect(request.referrer)
+    # Changed to asyc js so comment out redirect:
+    #return redirect(request.referrer)
+
+    return jsonify({"status": liked_status})
 
 
 @app.route('/users/<int:user_id>/likes')
