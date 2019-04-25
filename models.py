@@ -5,6 +5,10 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
+# Import func to use 'func.now()' in timestamp f
+# or default timestamp at database level
+from sqlalchemy.sql import func
+
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
@@ -181,7 +185,7 @@ class Message(db.Model):
     timestamp = db.Column(
         db.DateTime,
         nullable=False,
-        default=datetime.utcnow(),
+        server_default=func.now(),
     )
 
     user_id = db.Column(

@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-
+import functools
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
 from models import db, connect_db, User, Message, Like
 
@@ -24,6 +24,21 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
+
+
+##############################################################################
+# decorators:
+
+def auth_check(func):
+    @functools.wraps(func)
+    def wrapper_auth_check(*args, **kwargs):
+        if not g.user:
+            flash("Access unauthorized.", "danger")
+            return redirect("/")
+        
+        return func(*args, **kwargs)
+
+    return wrapper_auth_check
 
 
 ##############################################################################
@@ -156,36 +171,27 @@ def users_show(user_id):
 
 
 @app.route('/users/<int:user_id>/following')
+@auth_check
 def show_following(user_id):
     """Show list of people this user is following."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     user = User.query.get_or_404(user_id)
     return render_template('users/following.html', user=user)
 
 
 @app.route('/users/<int:user_id>/followers')
+@auth_check
 def users_followers(user_id):
     """Show list of followers of this user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     user = User.query.get_or_404(user_id)
     return render_template('users/followers.html', user=user)
 
 
 @app.route('/users/follow/<int:follow_id>', methods=['POST'])
+@auth_check
 def add_follow(follow_id):
     """Add a follow for the currently-logged-in user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     followee = User.query.get_or_404(follow_id)
     g.user.following.append(followee)
@@ -195,12 +201,9 @@ def add_follow(follow_id):
 
 
 @app.route('/users/stop-following/<int:follow_id>', methods=['POST'])
+@auth_check
 def stop_following(follow_id):
     """Have currently-logged-in-user stop following this user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     followee = User.query.get(follow_id)
     g.user.following.remove(followee)
@@ -210,12 +213,9 @@ def stop_following(follow_id):
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
+@auth_check
 def profile():
     """Update profile for current user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     form = UserEditForm(obj=g.user)
 
@@ -241,15 +241,11 @@ def profile():
 
 
 @app.route('/users/delete', methods=["POST"])
+@auth_check
 def delete_user():
     """Delete user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
     do_logout()
-
     db.session.delete(g.user)
     db.session.commit()
 
@@ -260,19 +256,17 @@ def delete_user():
 # Messages routes:
 
 @app.route('/messages/new', methods=["GET", "POST"])
+@auth_check
 def messages_add():
     """Add a message:
 
     Show form if GET. If valid, update message and redirect to user page.
     """
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-
     form = MessageForm()
 
     if form.validate_on_submit():
+        
         msg = Message(text=form.text.data)
         g.user.messages.append(msg)
         db.session.commit()
@@ -295,12 +289,9 @@ def messages_show(message_id):
 
 
 @app.route('/messages/<int:message_id>/delete', methods=["POST"])
+@auth_check
 def messages_destroy(message_id):
     """Delete a message."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     msg = Message.query.get(message_id)
     db.session.delete(msg)
@@ -314,6 +305,7 @@ def messages_destroy(message_id):
 
 
 @app.route('/messages/<int:message_id>/like', methods=["POST"])
+@auth_check
 def messages_like(message_id):
     """
     Like a message
@@ -346,6 +338,7 @@ def messages_like(message_id):
 
 
 @app.route('/users/<int:user_id>/likes')
+@auth_check
 def show_likes(user_id):
     """
     Show Likes - when clicking the number of
