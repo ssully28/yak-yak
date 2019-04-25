@@ -64,3 +64,4 @@ class MessageModelTestCase(TestCase):
 
         msg = Message.query.filter_by(text="TEST MESSAGE TEXT").first()
         self.assertEqual(msg.text, "TEST MESSAGE TEXT")
+
