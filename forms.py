@@ -8,6 +8,10 @@ class MessageForm(FlaskForm):
 
     text = TextAreaField('text', validators=[DataRequired()])
 
+    def serialize(self):
+        return ({"csrf_token": self.csrf_token, "text": self.text,
+                 "errors": self.text.errors})
+
 
 class UserAddForm(FlaskForm):
     """Form for adding users."""

@@ -277,9 +277,13 @@ def messages_add():
         g.user.messages.append(msg)
         db.session.commit()
 
-        return redirect(f"/users/{g.user.id}")
+        # Now handling via ajax so no need to redirect:
+        # return redirect(f"/users/{g.user.id}")
+        return jsonify({"status": "success"})
 
-    return render_template('messages/new.html', form=form)
+    # Now handling via ajax so not rendering
+    # return render_template('messages/new.html', form=form)
+    return jsonify({"form": form.serialize()})
 
 
 @app.route('/messages/<int:message_id>', methods=["GET"])
