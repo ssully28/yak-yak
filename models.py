@@ -44,8 +44,6 @@ class Like(db.Model):
         primary_key=True
     )
 
-    
-
 
 class User(db.Model):
     """User in the system."""
@@ -114,13 +112,15 @@ class User(db.Model):
     def is_followed_by(self, other_user):
         """Is this user followed by `other_user`?"""
 
-        found_user_list = [user for user in self.followers if user == other_user]
+        found_user_list = ([user for user in
+                            self.followers if user == other_user])
         return len(found_user_list) == 1
 
     def is_following(self, other_user):
         """Is this user following `other_use`?"""
 
-        found_user_list = [user for user in self.following if user == other_user]
+        found_user_list = ([user for user in
+                            self.following if user == other_user])
         return len(found_user_list) == 1
 
     @classmethod
@@ -192,11 +192,9 @@ class Message(db.Model):
 
     user = db.relationship('User')
 
-
     likes = db.relationship("User",
                             secondary="likes",
                             backref='likes')
-
 
 
 def connect_db(app):

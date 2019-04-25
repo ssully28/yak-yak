@@ -78,7 +78,8 @@ def signup():
             )
             db.session.commit()
 
-        except IntegrityError as e:
+        # was except IntegrityError as e:
+        except IntegrityError:
             flash("Username already taken", 'danger')
             return render_template('users/signup.html', form=form)
 
@@ -126,7 +127,7 @@ def list_users():
 
     Can take a 'q' param in querystring to search by that username.
     """
-    
+
     search = request.args.get('q')
 
     if not search:
@@ -235,10 +236,8 @@ def profile():
         else:
             flash("Invalid credentials.", 'danger')
             return redirect('/')
-        
-    return render_template("users/edit.html", form=form)
 
-        
+    return render_template("users/edit.html", form=form)
 
 
 @app.route('/users/delete', methods=["POST"])
@@ -305,19 +304,22 @@ def messages_destroy(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+
 ##############################################################################
 # Like Feature:
 
+
 @app.route('/messages/<int:message_id>/like', methods=["POST"])
 def messages_like(message_id):
-    """ 
-    Like a message 
+    """
+    Like a message
     Toggle liking - first check if message is
     already liked by g.user if so delete the like
     if not, then create the like...
     """
 
-    is_liked = Like.query.filter_by(message_id=message_id, user_id=g.user.id).first()
+    is_liked = Like.query.filter_by(message_id=message_id,
+                                    user_id=g.user.id).first()
     if is_liked:
         # Remove the like:
         db.session.delete(is_liked)
@@ -330,15 +332,19 @@ def messages_like(message_id):
 
     # Go back to the page that we liked/unliked the message from!
     return redirect(request.referrer)
-    
 
 
 @app.route('/users/<int:user_id>/likes')
 def show_likes(user_id):
+    """
+    Show Likes - when clicking the number of
+    likes on the user page show all messages
+    that user has liked.
+    """
     likes = Like.query.filter_by(user_id=g.user.id).all()
     message_ids = [like.message_id for like in likes]
     messages = Message.query.filter(Message.id.in_(message_ids)).all()
-    
+
     # Basic SQL of what we're looking for here....
     # SELECT * FROM messages 
     # JOIN likes 
@@ -359,7 +365,6 @@ def homepage():
     - logged in: 100 most recent messages of followees
     """
 
-    
     if g.user:
         # Grab user ids for all that user is following:
         target_ids = [user.id for user in g.user.following]
@@ -372,7 +377,6 @@ def homepage():
                     .filter(Message.user_id.in_(target_ids))
                     .limit(100)
                     .all())
-
 
         return render_template('home.html', messages=messages)
 

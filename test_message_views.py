@@ -71,3 +71,24 @@ class MessageViewTestCase(TestCase):
 
             msg = Message.query.one()
             self.assertEqual(msg.text, "Hello")
+
+    def test_delete_message(self):
+        """Can delete a message?"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.testuser.id
+
+            c.post("/messages/new", data={"text": "Hello"})
+
+            msg = Message.query.one()
+
+            response = c.post(f"/messages/{msg.id}/delete")
+
+            # First check that we redirect:
+            self.assertEqual(response.status_code, 302)
+
+            # Then test that the DB doesn't have any recs:
+            msg = Message.query.all()
+            self.assertCountEqual(msg, [])
+
