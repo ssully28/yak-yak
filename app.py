@@ -4,8 +4,8 @@ from flask import Flask, render_template, request, flash, redirect, session, g, 
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 import functools
-from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
-from models import db, connect_db, User, Message, Like
+from forms import UserAddForm, LoginForm, MessageForm, UserEditForm, DirectMessageForm
+from models import db, connect_db, User, Message, Like, DirectMessage
 from autocompletetrie import AutoCompleteTrie
 CURR_USER_KEY = "curr_user"
 
@@ -404,6 +404,50 @@ def autocomplete():
     subword = request.args['subword']
     autocomplete = ac_trie.autocomplete(subword)
     return jsonify({'autocomplete': autocomplete })
+
+
+##############################################################################
+# direct messages
+
+@app.route('/directmessage/new', methods=["POST", "GET"])
+@auth_check
+def direct_message():
+    """
+    Send a Direct Message:
+    Show form if GET. If valid, update message and redirect to user page.
+    """
+
+    form = DirectMessageForm()
+
+    if form.validate_on_submit():
+        # Create the DirectMessage Object:
+
+        # The user id is actually coming into this 
+        # as the username value (aka "Kings" instead of 123)
+        # so we need to convert that from username to the
+        # id
+
+        user_found = User.query.filter_by(username=form.to_user.data).first()
+        
+        if user_found:
+            
+            direct_message = DirectMessage(from_id=g.user.id,
+                                           to_id=user_found.id, 
+                                           text=form.text.data)
+
+            # Insert object into the database:
+            db.session.add(direct_message)
+
+            # commit - duh.
+            db.session.commit()
+
+            return jsonify({"status": "success"})
+        else:
+            
+            form.errors['user_error'] = "User does not exist"
+
+    return jsonify({"form": form.serialize()})
+
 
 ##############################################################################
 # Turn off all caching in Flask

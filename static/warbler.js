@@ -4,7 +4,7 @@ const BASE_URL = "http://localhost:5000";
 const $body = $("body");
 const $ac = $("#autocomplete");
 const $dmTo = $("#dm-to");
-
+const $dmDiv = $("#direct-message-div");
 
 // Handle like/dislike via ajax:
 $body.on("click", ".fa-heart", async function(evt) {
@@ -70,6 +70,71 @@ $("#new-warble-btn").on("click", async function(evt) {
     }
     
 })
+
+/*********************************** DIRECTMESSAGE  */
+// direct message form : 
+$("#direct-message-btn").on("click", async function(evt) {
+    evt.preventDefault();
+    
+    const response = await $.get(BASE_URL + '/directmessage/new');
+
+    //x$("#add-warble-form").append(response.token);
+
+    // response.form.csrf_token
+    // response.form.text
+    // response.form.errors [array]
+
+    // response.form.text: "<textarea id="text" name="text" required></textarea>"
+    // response.form.to_user: "<input id="to_user" name="to_user" required type="text" value="">"
+
+    $dmDiv.empty();
+    $dmDiv.append(response.form.csrf_token);
+    // TO USER and Auto complete
+    
+    $to_element = $(response.form.to_user).attr("data-toggle", "dropdown").attr("placeholder", "To...").attr("class", "form-control").attr("type", "search");
+    $dmDiv.append($to_element);
+
+    // Then text area
+    $text_element = $(response.form.text).attr("placeholder", "What would you like to say?").attr("class", "form-control").attr("rows", 5).attr("cols", 30).attr("id", "dm-message");
+
+    $dmDiv.append($text_element);
+    
+    
+})
+
+
+$("#direct-message-form").on("submit", async function(evt) {
+    evt.preventDefault();
+
+
+    // Create ajax post:
+    const response = await $.ajax({
+        type: "POST",
+        url: BASE_URL + '/directmessage/new',
+        
+        // need to serialize 'this' for post body:
+        data: $(this).serialize(),
+        
+        // To make wtforms CSRF check happy:
+        headers: {
+            "X-CSRFToken": "{{ form.csrf_token._value() }}"
+        }
+    })
+
+    console.log(response);
+    // Display any errors:
+    if (response.form.user_error) {
+        let err_html = `<span class="text-danger">${response.form.user_error}</span>`;
+        $dmDiv.append(err_html);
+    }
+    else {
+        window.location.reload();
+    }
+    
+    
+})
+
+
 
 /*********************************** AUTOCOMPLETE  */
 // Auto complete : Typing regular characters

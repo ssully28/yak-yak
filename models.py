@@ -201,6 +201,53 @@ class Message(db.Model):
                             backref='likes')
 
 
+class DirectMessage(db.Model):
+    """A direct message to another warbler"""
+
+    __tablename__ = 'direct_messages'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+
+    from_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+
+    to_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False,
+    )
+
+    text = db.Column(
+        db.String(140),
+        nullable=False,
+    )
+
+    timestamp = db.Column(
+        db.DateTime,
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    read = db.Column(
+        db.Boolean,
+        server_default='0',
+    )
+
+    to_relationship = db.relationship("User",
+                                      foreign_keys=to_id,
+                                      backref="inbox")
+
+    from_relationship = db.relationship("User",
+                                        foreign_keys=from_id,
+                                        backref="outbox")
+
+
 def connect_db(app):
     """Connect this database to provided Flask app.
 

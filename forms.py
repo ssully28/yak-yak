@@ -13,6 +13,18 @@ class MessageForm(FlaskForm):
                  "errors": self.text.errors})
 
 
+class DirectMessageForm(FlaskForm):
+    """Form for sending a direct message."""
+
+    to_user = StringField('To Warbler', validators=[DataRequired()])
+    text = TextAreaField('Message', validators=[DataRequired()])
+
+    def serialize(self):
+        return ({"csrf_token": self.csrf_token, "to_user": self.to_user,
+                 "text": self.text, "errors": self.text.errors, 
+                 "user_error": self.errors.get("user_error", [])})
+
+
 class UserAddForm(FlaskForm):
     """Form for adding users."""
 
