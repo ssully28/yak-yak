@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 import functools
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm
 from models import db, connect_db, User, Message, Like
-
+from autocompletetrie import AutoCompleteTrie
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
@@ -24,6 +24,13 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
+
+# Grab a list of names. Stupid SQLAlchemy makes it a tuple
+list_names = [name for (name,) in db.session.query(User.username)]
+
+# Build the autocomplete trie based of the list names
+ac_trie = AutoCompleteTrie()
+ac_trie.add_words_to_trie(list_names)
 
 
 ##############################################################################
@@ -387,6 +394,16 @@ def homepage():
     else:
         return render_template('home-anon.html')
 
+
+##############################################################################
+# autocomplete
+
+@app.route('/autocomplete')
+def autocomplete():
+    
+    subword = request.args['subword']
+    autocomplete = ac_trie.autocomplete(subword)
+    return jsonify({'autocomplete': autocomplete })
 
 ##############################################################################
 # Turn off all caching in Flask

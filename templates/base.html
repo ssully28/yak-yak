@@ -6,9 +6,6 @@
     <title>Warbler</title>
 
     <link rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
-    <script src="https://unpkg.com/jquery"></script>
-    <script src="https://unpkg.com/popper"></script>
-    <script src="https://unpkg.com/bootstrap"></script>
 
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
@@ -101,7 +98,12 @@
                         <form id="direct-message-form" method="POST">
                             <div id="direct-message-div">
                                 <!-- Form will be rendered here -->
-                                <input type="text" class="form-control" name="dm-to" id="dm-to" placeholder="Who you sending to?">
+                                <div class="auto-complete">
+                                    <input type="search" class="form-control" name="dm-to" id="dm-to" data-toggle="dropdown" placeholder="Who you sending to?">
+                                    <div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                       <!--  <a class="dropdown-item" href="#">Action</a> --> 
+                                      </div>
+                                </div>
                                 <textarea name="dm-message" class="form-control" id="dm-message" cols="30" rows="5" placeholder="What's your message"></textarea>
                             </div>
                             <button class="btn btn-outline-success btn-block">Send Message!</button>
@@ -142,6 +144,7 @@
             crossorigin="anonymous"></script>
 
         <script src="/static/warbler.js"></script>
+
 </body>
 
 </html>

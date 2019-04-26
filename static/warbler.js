@@ -2,6 +2,9 @@
 const BASE_URL = "http://localhost:5000";
 
 const $body = $("body");
+const $ac = $("#autocomplete");
+const $dmTo = $("#dm-to");
+
 
 // Handle like/dislike via ajax:
 $body.on("click", ".fa-heart", async function(evt) {
@@ -67,3 +70,49 @@ $("#new-warble-btn").on("click", async function(evt) {
     }
     
 })
+
+/*********************************** AUTOCOMPLETE  */
+// Auto complete : Typing regular characters
+$dmTo.on("keypress", async function(evt) {
+
+    // Grab the text typed
+    let text = $(this).val() + evt.key;
+    
+    // Grab the array of autocompleted suggestions
+    let response = await $.get(`${BASE_URL}/autocomplete`, {subword:text});
+    updateAutoCompleteUI(response.autocomplete);
+
+});
+
+// Just for backspace
+$dmTo.on("keydown", async function(evt) {
+    if (evt.keyCode === 8) {
+        let text = $(this).val().slice(0,-1);
+        
+        // Only show suggestions if the text field is not empty
+        if (text.length > 0) { 
+            // Grab the array of autocompleted suggestions
+            let response = await $.get(`${BASE_URL}/autocomplete`, {subword:text});
+            updateAutoCompleteUI(response.autocomplete);
+        } else {
+            $ac.empty();
+        }
+    }
+})
+
+// Updates the autocomplete UI with an array of usernames
+function updateAutoCompleteUI(usernamesArray) {
+    $ac.empty();
+    for (let username of usernamesArray) {
+        let autoForm = $(`<a class="dropdown-item">${username}</a>`);
+        $ac.append(autoForm);
+    };
+}
+
+// Selection from the autocomplete
+$ac.on("click", ".dropdown-item", function(evt) {
+    evt.preventDefault();
+    let text = $(this).text();
+    $dmTo.val(text);
+})
+    
