@@ -25,9 +25,9 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-# Grab a list of names. Stupid SQLAlchemy makes it a tuple
+# Grab a list of names. 
 list_names = [name for (name,) in db.session.query(User.username)]
-
+# list_names = []
 # Build the autocomplete trie based of the list names
 ac_trie = AutoCompleteTrie()
 ac_trie.add_words_to_trie(list_names)

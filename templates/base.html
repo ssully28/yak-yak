@@ -95,15 +95,17 @@
                 </div>
                 <div class="row justify-content-center">
                     <div class="col-md-6 pb-5 pt-3">
-                        <form id="direct-message-form" method="POST">
+                        <form id="direct-message-form" autocomplete="off" method="POST">
+                            <!-- This disables the Form Input Autocomplete/Autofill from HTML -->
+                            <input autocomplete="false" name="hidden" type="text" style="display:none;">
                             <div id="direct-message-div">
                                 <!-- Form will be rendered here -->
 
                                 <!-- <div class="auto-complete">
-                                    <input type="search" class="form-control" name="dm-to" id="dm-to" data-toggle="dropdown" placeholder="Who you sending to?">
+                                    <input type="search" class="form-control" name="to_user" id="to_user" data-toggle="dropdown" placeholder="Who you sending to?">
                                     <div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                        <a class="dropdown-item" href="#">Action</a>
-                                      </div>
+                                    </div>
                                 </div>
                                 <textarea name="dm-message" class="form-control" id="dm-message" cols="30" rows="5" placeholder="What's your message"></textarea> -->
 
