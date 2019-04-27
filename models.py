@@ -247,6 +247,24 @@ class DirectMessage(db.Model):
                                         foreign_keys=from_id,
                                         backref="outbox")
 
+    from_user = db.relationship("User",
+                                foreign_keys=from_id)
+
+    to_user = db.relationship("User",
+                              foreign_keys=to_id)
+
+    def serialize(self):
+        return ({"from_username": self.from_user.username,
+                 "from_userimage": self.from_user.image_url,
+                 "from_userid": self.from_user.id,
+                 "to_username": self.to_user.username,
+                 "to_userimage": self.to_user.image_url,
+                 "to_userid": self.to_user.id,
+                 "text": self.text,
+                 "timestamp": self.timestamp,
+                 "read": self.read
+                 })
+
 
 def connect_db(app):
     """Connect this database to provided Flask app.

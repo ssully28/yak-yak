@@ -52,12 +52,12 @@
               <p>{{ msg.text }}</p>
             </div>
             
-            <form class="like-form" action="/messages/{{ msg.id }}/like" method="POST">
+            <form class="like-form" action="/messages/{{ msg.id }}/like">
                 {% if msg.user_id != g.user.id %}
                     {% if g.user in msg.likes %} 
-                        <button class="like-btn" type="submit"><i class="fas fa-heart"></i></button>
+                        <button class="like-btn"><i class="fas fa-heart"></i></button>
                     {% else %}
-                        <button class="like-btn" type="submit"><i class="far fa-heart"></i></button> 
+                        <button class="like-btn"><i class="far fa-heart"></i></button> 
                     {% endif %}
                 {% endif %}
               </form> 

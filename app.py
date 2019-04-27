@@ -7,6 +7,8 @@ import functools
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm, DirectMessageForm
 from models import db, connect_db, User, Message, Like, DirectMessage
 from autocompletetrie import AutoCompleteTrie
+import datetime
+
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
@@ -447,6 +449,16 @@ def direct_message():
             form.errors['user_error'] = "User does not exist"
 
     return jsonify({"form": form.serialize()})
+
+
+@app.route('/directmessage/list')
+@auth_check
+def direct_message_list():
+    """Return a list of Direct Messages User Has Received"""
+
+    msg_list = [dm.serialize() for dm in g.user.inbox]
+
+    return jsonify(msg_list)
 
 
 ##############################################################################

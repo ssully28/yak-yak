@@ -1,13 +1,17 @@
 
 const BASE_URL = "http://localhost:5000";
 
+// Caching some frequently accessed DOM elements:
 const $body = $("body");
 const $dmDiv = $("#direct-message-div");
+const $dmList = $(".direct-messages-list");
+
 
 // Handle like/dislike via ajax:
 $body.on("click", ".fa-heart", async function (evt) {
     evt.preventDefault();
 
+    console.log(evt);
     // Grabbing the action from the grandparent:
     let action = $(this).parent().parent().attr("action");
 
@@ -21,6 +25,7 @@ $body.on("click", ".fa-heart", async function (evt) {
     else {
         $(this).removeClass('fas').addClass('far');
     }
+    evt.preventDefault();
 
 });
 
@@ -71,9 +76,15 @@ $("#direct-message-btn").on("click", async function (evt) {
 
     const response = await $.get(BASE_URL + '/directmessage/new');
 
+    // Clear out the DM form div:
     $dmDiv.empty();
+
+
+    // Add the CSRF token:
     $dmDiv.append(response.form.csrf_token);
-    // TO USER 
+
+
+    // Create the to-user input text element w/attributes:
     $to_element = $(response.form.to_user)
                     .attr("data-toggle", "dropdown")
                     .attr("placeholder", "To...")
@@ -81,15 +92,26 @@ $("#direct-message-btn").on("click", async function (evt) {
                     .attr("type", "search");
     $dmDiv.append($to_element);
 
+
     // Autocomplete
-    $auto = $(`<div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                </div>`);
+    $auto = $(`<div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton"></div>`);
     $dmDiv.append($auto);
 
-    // Then text area
-    $text_element = $(response.form.text).attr("placeholder", "What would you like to say?").attr("class", "form-control").attr("rows", 5).attr("cols", 30).attr("id", "dm-message");
+
+    // Then text area w/attributes:
+    $text_element = $(response.form.text)
+                      .attr("placeholder", "What would you like to say?")
+                      .attr("class", "form-control")
+                      .attr("rows", 5)
+                      .attr("cols", 30)
+                      .attr("maxlength", 140)
+                      .attr("id", "dm-message");
 
     $dmDiv.append($text_element);
+
+
+    // LOAD MESSAGES:
+    loadDirectMessages();
 
 })
 
@@ -117,8 +139,61 @@ $("#direct-message-form").on("submit", async function (evt) {
         $dmDiv.append(err_html);
     }
 
-
 })
+
+
+async function loadDirectMessages() {
+
+    // When loading the direct messages modal
+    // we'll want to query for unread messages 
+    // and up to 5 or 10 most recent messages....
+    // These will be both sent by the user and
+    // received from other uses.
+    // 1 - on loading the modal query for messages
+    // 2 - loop through returned messages and format
+    //     output
+    // 3 - append to $dmList
+
+    
+    const response = await $.get(BASE_URL + '/directmessage/list');
+
+    let messageList = '';
+
+    if (response.length > 0) {
+        
+        
+        // Show the most recent 5 direct messages:
+        for (let i = 0; i < Math.min(response.length, 5); i++) {
+
+            const dm = response[i];
+            // dm.
+            // from_userid: 301
+            // from_userimage: "https://images.homedepot-static.com/productImages/11b187f7-cdfc-49c7-bb44-31ec62d84f38/svn/black-fanmats-sports-rugs-18885-64_1000.jpg"
+            // from_username: "sharks"
+            // read: false
+            // text: "lets see if this one works at 11:50."
+            // timestamp: "Fri, 26 Apr 2019 11:51:00 GMT"
+            // to_userid: 301
+            // to_userimage: "https://images.homedepot-static.com/productImages/11b187f7-cdfc-49c7-bb44-31ec62d84f38/svn/black-fanmats-sports-rugs-18885-64_1000.jpg"
+            // to_username: "sharks"
+
+            let timestamp = new Date(dm.timestamp);
+            
+
+            
+            messageList += `<div class="d-flex justify-content-between pt-3 px-3 border-top">
+                                <span><img class="timeline-image" src="${dm.from_userimage}" alt="logo"><span class="h5 pl-2">@${dm.from_username}</span></span>
+                                <span class="pt-2 h6">${timestamp.toLocaleString()}</span>
+                            </div>
+                            <p class="px-3 pt-2">${dm.text}</p>`;
+
+        }
+
+        $dmList.append(messageList);
+    }
+
+}
+
 
 
 
