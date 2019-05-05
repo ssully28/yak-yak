@@ -213,14 +213,12 @@ class DirectMessage(db.Model):
 
     from_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete='CASCADE'),
-        nullable=False,
+        db.ForeignKey('users.id', ondelete='CASCADE')
     )
 
     to_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete='CASCADE'),
-        nullable=False,
+        db.ForeignKey('users.id', ondelete='CASCADE')
     )
 
     text = db.Column(

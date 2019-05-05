@@ -26,8 +26,15 @@
             <ul class="nav navbar-nav navbar-right">
                 {% if request.endpoint != None %}
                 <li>
-                    <form class="navbar-form navbar-right" action="/users">
-                        <input name="q" class="form-control" placeholder="Search Warbler" id="search">
+                    <form class="navbar-form navbar-right" autocomplete="off" action="/users">
+                        <input name="q" class="form-control" placeholder="Search Warbler" data-toggle="dropdown" id="search">
+                         <!-- This disables the Form Input Autocomplete/Autofill from HTML -->
+                        <input autocomplete="false" name="hidden" type="text" style="display:none;">
+                        
+                        <div id="autocomplete-search" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <!-- <a class="dropdown-item" href="#"></a> -->
+                         </div>
+                       
                         <button class="btn btn-default">
                             <span class="fa fa-search"></span>
                         </button>
@@ -103,7 +110,7 @@
 
                                 <!-- <div class="auto-complete">
                                     <input type="search" class="form-control" name="to_user" id="to_user" data-toggle="dropdown" placeholder="Who you sending to?">
-                                    <div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <div id="autocomplete-to_user" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                        <a class="dropdown-item" href="#">Action</a>
                                     </div>
                                 </div>

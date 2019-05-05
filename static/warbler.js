@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "";
 
 // Caching some frequently accessed DOM elements:
 const $body = $("body");
@@ -11,7 +11,6 @@ const $dmList = $(".direct-messages-list");
 $body.on("click", ".fa-heart", async function (evt) {
     evt.preventDefault();
 
-    console.log(evt);
     // Grabbing the action from the grandparent:
     let action = $(this).parent().parent().attr("action");
 
@@ -79,7 +78,6 @@ $("#direct-message-btn").on("click", async function (evt) {
     // Clear out the DM form div:
     $dmDiv.empty();
 
-
     // Add the CSRF token:
     $dmDiv.append(response.form.csrf_token);
 
@@ -94,7 +92,7 @@ $("#direct-message-btn").on("click", async function (evt) {
 
 
     // Autocomplete
-    $auto = $(`<div id="autocomplete" class="dropdown-menu" aria-labelledby="dropdownMenuButton"></div>`);
+    $auto = $(`<div id="autocomplete-to_user" class="dropdown-menu" aria-labelledby="dropdownMenuButton"></div>`);
     $dmDiv.append($auto);
 
 
@@ -199,40 +197,45 @@ async function loadDirectMessages() {
 
 /*********************************** AUTOCOMPLETE  */
 // Auto complete : Typing regular characters
-$body.on("keypress", "#to_user", async function (evt) {
-
+$body.on("keypress", "#to_user, #search", debounce(async function (evt) {
+    
+    let $input = $(this);
     // Grab the text typed
-    let text = $(this).val() + evt.key;
+    let text = $input.val();
 
     // Grab the array of autocompleted suggestions
     let response = await $.get(`${BASE_URL}/autocomplete`, { subword: text });
-    updateAutoCompleteUI(response.autocomplete);
 
-});
+    updateAutoCompleteUI(response.autocomplete, $input.attr("id"));
+
+}, 500));
 
 // Just for backspace
-$body.on("keydown", "#to_user", async function (evt) {
+$body.on("keydown", "#to_user, #search", debounce(async function (evt) {
+    let $input = $(this);
+    
     if (evt.keyCode === 8) {
-        let text = $(this).val().slice(0, -1);
+        let text = $input.val();
 
         // Only show suggestions if the text field is not empty
         if (text.length > 0) {
             // Grab the array of autocompleted suggestions
             let response = await $.get(`${BASE_URL}/autocomplete`, { subword: text });
-            updateAutoCompleteUI(response.autocomplete);
+            updateAutoCompleteUI(response.autocomplete, $input.attr("id"));
         } else {
-            $ac.empty();
+            $input.empty();
         }
     }
-})
+}, 500));
 
 // Updates the autocomplete UI with an array of usernames
-function updateAutoCompleteUI(usernamesArray) {
-    let $ac = $("#autocomplete");
-    $ac.empty();
+function updateAutoCompleteUI(usernamesArray, input_id) {
+    
+    $autocomplete = $(`#autocomplete-${input_id}`)
+    $autocomplete.empty();
     for (let username of usernamesArray) {
         let autoForm = $(`<a class="dropdown-item">${username}</a>`);
-        $ac.append(autoForm);
+        $autocomplete.append(autoForm);
     };
 }
 
@@ -241,6 +244,30 @@ $body.on("click", ".dropdown-item", function (evt) {
 
     evt.preventDefault();
     let text = $(this).text();
-    $("#to_user").val(text);
+    // Grab the inputtextID based off the current clicked div
+    let inputTextId = $(this).parent().attr('id').split('-')[1];
+
+    // Set the text
+    $(`#${inputTextId}`).val(text);
 })
 
+
+/** debouncing function:
+ * https://ourcodeworld.com/articles/read/16/what-is-the-debounce-method-and-how-to-use-it-in-javascript
+ */
+function debounce(func, wait, immediate) {
+    let timeout;
+    return function() {
+        let context = this;
+        let args = arguments;
+        let later = function() {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    }
+
+}

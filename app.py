@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError, ProgrammingError
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm, DirectMessageForm
 from models import db, connect_db, User, Message, Like, DirectMessage
 
@@ -20,7 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgres:///warbler'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
 
@@ -28,13 +28,14 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-# # Grab a list of names. 
+# NOTE: Uncomment out these ac_trie lines after running seed.py 
+
+# Grab a list of names. 
 # list_names = [name for (name,) in db.session.query(User.username)]
-# # list_names = []
+
 # # Build the autocomplete trie based of the list names
 # ac_trie = AutoCompleteTrie()
 # ac_trie.add_words_to_trie(list_names)
-
 
 ##############################################################################
 # User signup/login/logout
@@ -386,15 +387,16 @@ def homepage():
 ##############################################################################
 # autocomplete
 
-# @app.route('/autocomplete')
-# def autocomplete():
+@app.route('/autocomplete')
+def autocomplete():
     
-#     subword = request.args['subword']
-#     if not ac_trie:
-#         print("Autocomplete tree has not yet been built")
-#         raise NotImplementedError
-#     autocomplete = ac_trie.autocomplete(subword)
-#     return jsonify({'autocomplete': autocomplete })
+    subword = request.args['subword']
+    if not ac_trie:
+        print("Autocomplete tree has not yet been built")
+        return jsonify({'autocomplete' : ["not yet implemented"]})
+    autocomplete = ac_trie.autocomplete(subword)
+    print("retuning:", autocomplete)
+    return jsonify({'autocomplete': autocomplete })
 
 
 ##############################################################################

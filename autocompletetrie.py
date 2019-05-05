@@ -70,9 +70,9 @@ class AutoCompleteTrie:
     return curr.list_words
 
 
-
 if __name__ == "__main__":
 
+  print("Testing...")
   names = ['orlando', 'oreo', 'olivia', 'oliver', 'orangutan', 'austin', 'jason', 'jacques']
 
   tri = AutoCompleteTrie()
