@@ -3,11 +3,12 @@ import os
 from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-import functools
 from forms import UserAddForm, LoginForm, MessageForm, UserEditForm, DirectMessageForm
 from models import db, connect_db, User, Message, Like, DirectMessage
+
+from decorators import auth_check
 from autocompletetrie import AutoCompleteTrie
-import datetime
+
 
 CURR_USER_KEY = "curr_user"
 
@@ -27,27 +28,12 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-# Grab a list of names. 
-list_names = [name for (name,) in db.session.query(User.username)]
-# list_names = []
-# Build the autocomplete trie based of the list names
-ac_trie = AutoCompleteTrie()
-ac_trie.add_words_to_trie(list_names)
-
-
-##############################################################################
-# decorators:
-
-def auth_check(func):
-    @functools.wraps(func)
-    def wrapper_auth_check(*args, **kwargs):
-        if not g.user:
-            flash("Access unauthorized.", "danger")
-            return redirect("/")
-        
-        return func(*args, **kwargs)
-
-    return wrapper_auth_check
+# # Grab a list of names. 
+# list_names = [name for (name,) in db.session.query(User.username)]
+# # list_names = []
+# # Build the autocomplete trie based of the list names
+# ac_trie = AutoCompleteTrie()
+# ac_trie.add_words_to_trie(list_names)
 
 
 ##############################################################################
@@ -400,12 +386,15 @@ def homepage():
 ##############################################################################
 # autocomplete
 
-@app.route('/autocomplete')
-def autocomplete():
+# @app.route('/autocomplete')
+# def autocomplete():
     
-    subword = request.args['subword']
-    autocomplete = ac_trie.autocomplete(subword)
-    return jsonify({'autocomplete': autocomplete })
+#     subword = request.args['subword']
+#     if not ac_trie:
+#         print("Autocomplete tree has not yet been built")
+#         raise NotImplementedError
+#     autocomplete = ac_trie.autocomplete(subword)
+#     return jsonify({'autocomplete': autocomplete })
 
 
 ##############################################################################
