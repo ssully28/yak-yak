@@ -19,15 +19,15 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a href="/" class="navbar-brand">
-                    <img src="/static/images/warbler-logo.png" alt="logo">
-                    <span>Warbler</span>
+                    <img src="/static/images/yak-logo.png" alt="logo">
+                    <span>YAK</span>
                 </a>
             </div>
             <ul class="nav navbar-nav navbar-right">
                 {% if request.endpoint != None %}
                 <li>
                     <form class="navbar-form navbar-right" autocomplete="off" action="/users">
-                        <input name="q" class="form-control" placeholder="Search Warbler" data-toggle="dropdown" id="search">
+                        <input name="q" class="form-control" placeholder="Search Yak" data-toggle="dropdown" id="search">
                          <!-- This disables the Form Input Autocomplete/Autofill from HTML -->
                         <input autocomplete="false" name="hidden" type="text" style="display:none;">
                         
@@ -55,7 +55,7 @@
                             id="direct-message-btn" 
                             data-toggle="modal" 
                             data-target="#directMessage"><i class="fas fa-envelope"></i></button></li>
-                <li><button class="btn btn-sm btn-success" id="new-warble-btn" data-toggle="modal" data-target="#newMessage">Post a Warble</button></li>
+                <li><button class="btn btn-sm btn-success" id="new-warble-btn" data-toggle="modal" data-target="#newMessage">Post a Yak</button></li>
                 <li><a href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
@@ -154,7 +154,7 @@
             integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
             crossorigin="anonymous"></script>
 
-        <script src="/static/warbler.js"></script>
+        <script src="/static/yak.js"></script>
 
 </body>
 

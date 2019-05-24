@@ -11,7 +11,7 @@ from sqlalchemy.exc import IntegrityError
 
 from models import db, connect_db, Message, User, Like
 
-os.environ['DATABASE_URL'] = "postgresql:///warbler-test"
+os.environ['DATABASE_URL'] = "postgresql:///yak-test"
 
 
 # Now we can import app

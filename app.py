@@ -17,7 +17,7 @@ app = Flask(__name__)
 # Get DB_URI from environ variable (useful for production/testing) or,
 # if not set there, use development local db.
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgres:///warbler'))
+    os.environ.get('DATABASE_URL', 'postgres:///yak'))
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
@@ -31,11 +31,11 @@ connect_db(app)
 # NOTE: Uncomment out these ac_trie lines after running seed.py 
 
 # Grab a list of names. 
-# list_names = [name for (name,) in db.session.query(User.username)]
+list_names = [name for (name,) in db.session.query(User.username)]
 
-# # Build the autocomplete trie based of the list names
-# ac_trie = AutoCompleteTrie()
-# ac_trie.add_words_to_trie(list_names)
+# Build the autocomplete trie based of the list names
+ac_trie = AutoCompleteTrie()
+ac_trie.add_words_to_trie(list_names)
 
 ##############################################################################
 # User signup/login/logout

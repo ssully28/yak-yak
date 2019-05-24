@@ -78,7 +78,7 @@ class User(db.Model):
 
     header_image_url = db.Column(
         db.Text,
-        default="/static/images/warbler-hero.jpg"
+        default="/static/images/yak-hero.jpg"
     )
 
     bio = db.Column(
@@ -202,7 +202,7 @@ class Message(db.Model):
 
 
 class DirectMessage(db.Model):
-    """A direct message to another warbler"""
+    """A direct message to another yak"""
 
     __tablename__ = 'direct_messages'
 
