@@ -16,7 +16,7 @@ class MessageForm(FlaskForm):
 class DirectMessageForm(FlaskForm):
     """Form for sending a direct message."""
 
-    to_user = StringField('To Warbler', validators=[DataRequired()])
+    to_user = StringField('To YAK', validators=[DataRequired()])
     text = TextAreaField('Message', validators=[DataRequired()])
 
     def serialize(self):

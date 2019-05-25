@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Warbler</title>
+    <title>YAK</title>
 
     <link rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
 
@@ -15,7 +15,7 @@
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
-    <nav class="navbar navbar-expand">
+    <nav class="navbar bg-light navbar-expand">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a href="/" class="navbar-brand">
@@ -55,7 +55,7 @@
                             id="direct-message-btn" 
                             data-toggle="modal" 
                             data-target="#directMessage"><i class="fas fa-envelope"></i></button></li>
-                <li><button class="btn btn-sm btn-success" id="new-warble-btn" data-toggle="modal" data-target="#newMessage">Post a Yak</button></li>
+                <li><button class="btn btn-sm btn-info" id="new-yak-btn" data-toggle="modal" data-target="#newMessage">Post a Yak</button></li>
                 <li><a href="/logout">Log out</a></li>
                 {% endif %}
             </ul>
@@ -68,7 +68,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Create Warble</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Create Yak</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -76,7 +76,7 @@
                 <div class="row justify-content-center">
                     <div class="col-md-6 pb-5 pt-3">
                         <form id="add-warble-form" method="POST">
-                            <div id="add-warble-div">
+                            <div id="add-yak-div">
                                 <!-- Form will be rendered here -->
                             </div>
                             <button class="btn btn-outline-success btn-block">Add my message!</button>

@@ -28,14 +28,6 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
-# NOTE: Uncomment out these ac_trie lines after running seed.py 
-
-# Grab a list of names. 
-list_names = [name for (name,) in db.session.query(User.username)]
-
-# Build the autocomplete trie based of the list names
-ac_trie = AutoCompleteTrie()
-ac_trie.add_words_to_trie(list_names)
 
 ##############################################################################
 # User signup/login/logout
@@ -391,11 +383,13 @@ def homepage():
 def autocomplete():
     
     subword = request.args['subword']
-    if not ac_trie:
-        print("Autocomplete tree has not yet been built")
-        return jsonify({'autocomplete' : ["not yet implemented"]})
+    # Grab a list of names. 
+    list_names = [name for (name,) in db.session.query(User.username)]
+
+    # Build the autocomplete trie based of the list names
+    ac_trie = AutoCompleteTrie()
+    ac_trie.add_words_to_trie(list_names)
     autocomplete = ac_trie.autocomplete(subword)
-    print("retuning:", autocomplete)
     return jsonify({'autocomplete': autocomplete })
 
 
